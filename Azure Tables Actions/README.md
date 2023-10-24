@@ -1,27 +1,23 @@
-# ImmyBot Storage Monitor
+# Azure Tables Actions
 
 ## What integrations are required?
 
-- ImmyBot
-- ConnectWise Manage
+- Core
 
 ## What does this workflow do?
 
-This workflow will get all ImmyBot devices, query their last reported volume storage metrics, create a list of 
-devices that need attention at each client the workflow runs under, and then creates a ConnectWise Manage ticket to 
-alert on any devices with a volume that has less than 15% space left
+This workflow will acquire a valid OAUTH2.0 client credentials token, store it along with an expiration value in Rewst's org variables as a secret, then allow for GET and INSERT actions on an Azure Table
 
 ## How do I use this workflow?
 
-### Task Parameters
+### Inputs
 
-The "Board ID" and "Status ID" must be changed to match your manage instance. For example, at our MSP these tickets 
-are generated on a NOC board for emergent issues that require technician intervention with a "Ready to Dispatch" 
-status
+This workflow has several inputs, and all are required besides the token org variable name. In order to acquire a valid OAUTH2.0 access token, you will need an Entra App Registration that has been granted access to your storage account with permissions to read and edit tables. The tenant ID, Client ID, and Client Secret must be entered to the input variables. Additonally, you will need to know the Row and Partition keys for the data you want to insert or get. If inserting data, the key can be inputted in the `dataName` input, and the value inputted to the `dataValue` input
+
+### Outputs
+
+If data is found, the workflow will output it in a `tableData` output variable. If errors are found and caught, they will be populated in the `errorCollector` output variable
 
 ### Triggers
 
-There are two triggers, "DEV" and "Every 48 Hours". DEV is a simple webhook trigger, and contains the required 
-integration override to test the workflow manually within a sub-organization's context. The Prod trigger will run 
-on a 48 hour interval, providing an automated bi-daily sync. The schedule can be edited in this Prod 
-workflow if needed, along with the sub-organizations allowed to run (default is all)
+This is designed to be a subworkflow, and thus has no triggers. If you wish to test this workflow, you may want to consider making an "Always Pass" trigger for development
